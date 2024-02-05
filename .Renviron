@@ -1,0 +1,2 @@
+# change renv default library path to keep it inside the proj path
+RENV_PATHS_LIBRARY = renv/library
