@@ -4,13 +4,14 @@
 
 
 wd <- "/usr/local/etc/yasa/"
-default_renv_lib <- "/usr/local/etc/yasa/renv/library/R-4.2/x86_64-pc-linux-gnu/"
+# default_renv_lib <- "/usr/local/etc/yasa/renv/library/R-4.2/x86_64-pc-linux-gnu/"
 
 setwd(wd)
 # renv::load(wd)
-.libPaths(default_renv_lib)
+# .libPaths(default_renv_lib)
 library(shiny)
 library(yasa)
+# devtools::load_all()
 
 path_config <- head(commandArgs(TRUE), n = 1L)
 if (length(path_config) == 0L) {
