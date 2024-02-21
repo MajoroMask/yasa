@@ -15,6 +15,21 @@ app_ui <- function(request) {
   )
 }
 
+#' The esquisse User-Interface
+#'
+#' @param request Internal parameter for `{shiny}`.
+#'     DO NOT REMOVE.
+#' @import shiny
+#' @noRd
+my_esquisse_ui <- function(request) {
+  tagList(
+    # Leave this function for adding external resources
+    golem_add_external_resources(),
+    # Your application UI logic
+    mod_my_esquisse_ui("my_esquisse_1")
+  )
+}
+
 #' Add external Resources to the Application
 #'
 #' This function is internally used to add external

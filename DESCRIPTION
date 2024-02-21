@@ -7,8 +7,12 @@ Description: A shiny app for proteome team @shenkebio.
 License: MIT + file LICENSE
 Imports: 
     config (>= 0.3.2),
+    datamods,
+    esquisse,
     golem (>= 0.4.1),
-    shiny (>= 1.8.0)
+    shiny (>= 1.8.0),
+    shinydashboard,
+    shinydashboardPlus
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

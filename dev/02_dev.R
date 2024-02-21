@@ -39,13 +39,16 @@ options(repos = BiocManager::repositories())
 ## Amend DESCRIPTION with dependencies read from package code parsing
 ## install.packages('attachment') # if needed.
 attachment::att_amend_desc()
+usethis::use_package("shinydashboard")
 usethis::use_package("shinydashboardPlus")
 usethis::use_package("esquisse")
+usethis::use_package("datamods")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
 # golem::add_module(name = "name_of_module1", with_test = TRUE) # Name of the module
 # golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the module
+golem::add_module(name = "my_esquisse", with_test = TRUE)
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
