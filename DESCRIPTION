@@ -1,6 +1,6 @@
 Package: yasa
 Title: yasa ain't stable app
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person("Su", "Na", , "nas@shenkebio.com", role = c("cre", "aut"))
 Description: A shiny app for proteome team @shenkebio.
