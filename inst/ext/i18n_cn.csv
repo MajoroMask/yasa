@@ -1,0 +1,43 @@
+label,translation
+Interactive ggplot,交互式做图
+Venn diagram,文氏图
+Venn diagrams,文氏图
+Data upload & settings,数据和参数设置
+Upload data,上传数据
+Upload file,上传文件
+Header line in data,数据中包含标题行
+Venn diagram example data,文氏图示例数据
+Settings,参数设置
+Select sets,选择组别
+Classical venn,经典文氏图
+Chow-Ruskey venn,Chow-Ruskey文氏图
+Edwards venn,Edwards文氏图
+Squares venn,矩形文氏图
+Battle venn,Battle文氏图
+Weighted area,面积加权
+Label percentage,标注百分比
+Border line width,边框宽度
+Border line type,边框类型
+Solid,实线
+Dashed,虚线
+Dotted,点状
+Dot dash,点状 + 虚线
+Long dash,长虚线
+Two dash,双虚线
+Blank,无边框
+Zoom in/out Venn diagram,放大/缩小
+Color & Font,颜色和字体
+Select color theme,选择颜色主题
+Set1,集合1
+Set2,集合2
+Set3,集合3
+Set4,集合4
+Set5,集合5
+Set6,集合6
+Label font size,标签大小
+Number font size,数字大小
+Plot & Usage Instructions,绘图和使用说明
+Choose output file type:,选择结果保存格式
+Download Plot,下载做图结果
+Usage Instructions,使用说明
+Venn diagram type,文氏图类型

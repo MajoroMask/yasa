@@ -26,32 +26,3 @@ run_app <- function(
     golem_opts = list(...)
   )
 }
-
-#' Run my version of esquisse app
-#'
-#' @param ... arguments to pass to golem_opts.
-#' See `?golem::get_golem_options` for more details.
-#' @inheritParams shiny::shinyApp
-#'
-#' @export
-#' @importFrom shiny shinyApp
-#' @importFrom golem with_golem_options
-run_my_esquisse <- function(
-    onStart = NULL,
-    options = list(),
-    enableBookmarking = NULL,
-    uiPattern = "/",
-    ...
-) {
-  with_golem_options(
-    app = shinyApp(
-      ui = my_esquisse_ui,
-      server = my_esquisse_server,
-      onStart = onStart,
-      options = options,
-      enableBookmarking = enableBookmarking,
-      uiPattern = uiPattern
-    ),
-    golem_opts = list(...)
-  )
-}

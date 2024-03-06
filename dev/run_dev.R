@@ -12,5 +12,6 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 # Run the application
-# run_app()
-run_my_esquisse()
+# set_i18n("cn")
+# set_i18n(system.file("ext/i18n_cn.csv", package = "yasa"), packages = "yasa")
+run_app()

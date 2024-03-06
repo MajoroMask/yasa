@@ -8,25 +8,8 @@ app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-    # Your application UI logic
-    fluidPage(
-      h1("yasa")
-    )
-  )
-}
 
-#' The esquisse User-Interface
-#'
-#' @param request Internal parameter for `{shiny}`.
-#'     DO NOT REMOVE.
-#' @import shiny
-#' @noRd
-my_esquisse_ui <- function(request) {
-  tagList(
-    # Leave this function for adding external resources
-    golem_add_external_resources(),
-    # Your application UI logic
-    mod_my_esquisse_ui("my_esquisse_1")
+    mod_main_page_ui("main_page")
   )
 }
 
