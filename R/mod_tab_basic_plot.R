@@ -24,12 +24,6 @@ mod_tab_basic_plot_ui <- function(id){
         )
       )
     )
-    # fluidRow(
-    #   shinydashboardPlus::box(
-    #     width = 12,
-    #     title = i18n("Description")
-    #   )
-    # )
   )
 }
 

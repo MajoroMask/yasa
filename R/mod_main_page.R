@@ -32,6 +32,8 @@ mod_main_page_server <- function(id){
     mod_tab_basic_plot_server("tab_basic_plot")
 
     mod_tab_venn_upset_server("tab_venn_upset")
+
+    mod_subtab_is_calibration_server("is_calibration")
   })
 }
 
@@ -77,6 +79,23 @@ main_page_sidebar <- function(ns) {
         badgeLabel = NULL,
         badgeColor = "green",
         icon = icon("hand-spock", class = "fa-solid", lib = "font-awesome")
+      ),
+      shinydashboard::menuItem(
+        text = i18n("Utilities"),
+        tabName = "utilities",
+        expandedName = "utilities_expand",
+        newtab = FALSE,
+        selected = FALSE,
+        badgeLabel = NULL,
+        badgeColor = "green",
+        icon = icon("toolbox", class = "fa-solid", lib = "font-awesome"),
+        shinydashboard::menuSubItem(
+          text = i18n("IS Calibration"),
+          tabName = "is_calibration",
+          newtab = FALSE,
+          selected = FALSE,
+          icon = icon("calculator", class = "fa-solid", lib = "font-awesome")
+        )
       )
     ),
     id = "main_page_sidebar",
@@ -94,7 +113,8 @@ main_page_body <- function(ns) {
   shinydashboard::dashboardBody(
     shinydashboard::tabItems(
       mod_tab_basic_plot_ui(ns("tab_basic_plot")),
-      mod_tab_venn_upset_ui(ns("tab_venn_upset"))
+      mod_tab_venn_upset_ui(ns("tab_venn_upset")),
+      mod_subtab_is_calibration_ui(ns("is_calibration"))
     )
   )
 }

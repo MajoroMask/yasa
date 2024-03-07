@@ -41,7 +41,8 @@ mod_tab_venn_upset_ui <- function(id){
                 "text/comma-separated-values",
                 "text/tab-separated-values",
                 ".csv",
-                ".tsv"
+                ".tsv",
+                ".xlsx"
               )
             ),
             shiny::checkboxInput(
@@ -256,7 +257,8 @@ mod_tab_venn_upset_ui <- function(id){
 #' @importFrom vroom vroom_write
 #' @importFrom tibble tibble
 #' @import Vennerable
-#' @importClassesFrom Vennerable VDedgeLines
+#' @importFrom scales percent
+#' @importFrom grDevices dev.off pdf png svg tiff
 mod_tab_venn_upset_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
@@ -267,29 +269,15 @@ mod_tab_venn_upset_server <- function(id){
 
       if(!is.null(inFile)) {
         data <-
-          vroom::vroom(
+          read_input_tb(
             input$file_venn$datapath,
-            col_names = input$header_venn,
-            show_col_types = FALSE
+            col_names = input$header_venn
           ) %>%
           purrr::map(.f = ~ .x[!is.na(.x)])
       } else {
         data <-
-          tibble::tibble(
-            set1 = paste0("gene", sprintf("%02d", 1:50)),
-            set2 = c(
-              paste0("gene", sprintf("%02d", 31:70)),
-              rep(NA_character_, 10)
-            ),
-            set3 = c(
-              paste0("gene", sprintf("%02d", seq(1, 70, 2))),
-              rep(NA_character_, 15)
-            ),
-            set4 = c(
-              paste0("gene", sprintf("%02d", seq(21, 80, 2))),
-              rep(NA_character_, 20)
-            )
-          ) %>%
+          system.file("ext/venn_example_data.xlsx", package = "yasa") %>%
+          read_input_tb(col_names = input$header_venn) %>%
           purrr::map(.f = ~ .x[!is.na(.x)])
       }
     })
@@ -484,26 +472,11 @@ mod_tab_venn_upset_server <- function(id){
 
     # test data to download
     output$download_test_data_venn <- shiny::downloadHandler(
-      filename = "testdata_venn.csv",
+      filename = "venn_example_data.xlsx",
       content = function(file) {
-        tb_output <- tibble::tibble(
-          set1 = paste0("gene", sprintf("%02d", 1:50)),
-          set2 = c(
-            paste0("gene", sprintf("%02d", 31:70)),
-            rep(NA_character_, 10)
-          ),
-          set3 = c(
-            paste0("gene", sprintf("%02d", seq(1, 70, 2))),
-            rep(NA_character_, 15)
-          ),
-          set4 = c(
-            paste0("gene", sprintf("%02d", seq(21, 80, 2))),
-            rep(NA_character_, 20)
-          )
-        )
-        vroom::vroom_write(
-          tb_output, file = file,
-          delim = ",", na = ""
+        file.copy(
+          from = system.file("ext/venn_example_data.xlsx", package = "yasa"),
+          to = file
         )
       }
     )

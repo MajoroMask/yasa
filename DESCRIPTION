@@ -6,13 +6,24 @@ Authors@R:
 Description: A shiny app for proteome team @shenkebio.
 License: MIT + file LICENSE
 Imports: 
+    colourpicker,
     config (>= 0.3.2),
     datamods,
+    DT,
     esquisse,
+    fs,
     golem (>= 0.4.1),
+    magrittr,
+    openxlsx,
+    purrr,
+    scales,
     shiny (>= 1.8.0),
     shinydashboard,
-    shinydashboardPlus
+    shinydashboardPlus,
+    stringr,
+    tibble,
+    tidyr,
+    vroom
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
@@ -22,4 +33,5 @@ Language: en-US
 LazyData: true
 RoxygenNote: 7.3.1
 Depends: 
+    dplyr,
     Vennerable

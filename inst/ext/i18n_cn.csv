@@ -41,3 +41,16 @@ Choose output file type:,选择结果保存格式
 Download Plot,下载做图结果
 Usage Instructions,使用说明
 Venn diagram type,文氏图类型
+Utilities,小工具
+IS Calibration,内参校正
+Output & Usage Instructions,结果和使用说明
+Upload protein list,上传蛋白列表
+Protein list example data,蛋白列表示例数据
+Upload peptide list,上传肽段列表
+Peptide list example data,肽段列表示例数据
+Upload IS table,上传内参表
+IS table example data,内参表示例数据
+Unit in IS table,内参表单位
+Drop IS Top2,启用“Drop Top2”模式
+Table Output preview,结果表格预览
+Download Table,下载表格
