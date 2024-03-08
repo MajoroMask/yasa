@@ -125,6 +125,12 @@ mod_tab_venn_upset_ui <- function(id){
               label = i18n("Select color theme"),
               choices = list(
                 Set1 = "Set1",
+                AAAS = "aaas",
+                NPG = "npg",
+                NEJM = "nejm",
+                Lancet = "lancet",
+                JAMA = "jama",
+                JCO = "jco",
                 Custom = "custom"
               ),
               selected = "Set1"
@@ -349,7 +355,9 @@ mod_tab_venn_upset_server <- function(id){
         }
       )
 
-      if (input$venn_color_type == 'custom'){
+      if (input$venn_color_type == 'Set1') {
+        # do nothing
+      } else if (input$venn_color_type == 'custom') {
         venn_gp$Set$Set1$col <- input$set1_color
         venn_gp$Set$Set2$col <- input$set2_color
         venn_gp$Set$Set3$col <- input$set3_color
@@ -363,6 +371,11 @@ mod_tab_venn_upset_server <- function(id){
         venn_gp$SetText$Set4$col <- input$set4_color
         venn_gp$SetText$Set5$col <- input$set5_color
         venn_gp$SetText$Set6$col <- input$set6_color
+      } else {
+        venn_gp <- update_venn_color(
+          venn_gp,
+          ggsci_pal_name = input$venn_color_type
+        )
       }
 
       return(venn_gp)
@@ -481,4 +494,31 @@ mod_tab_venn_upset_server <- function(id){
       }
     )
   })
+}
+
+# utils ----
+
+update_venn_color <- function(venn_gp, ggsci_pal_name) {
+  requireNamespace("ggsci", quietly = TRUE)
+
+  ggsci_pal_func <-
+    paste0("pal_", ggsci_pal_name) %>%
+    get(envir = getNamespace("ggsci"))
+  colors <- ggsci_pal_func()(6)
+
+  venn_gp$Set$Set1$col <- colors[1]
+  venn_gp$Set$Set2$col <- colors[2]
+  venn_gp$Set$Set3$col <- colors[3]
+  venn_gp$Set$Set4$col <- colors[4]
+  venn_gp$Set$Set5$col <- colors[5]
+  venn_gp$Set$Set6$col <- colors[6]
+
+  venn_gp$SetText$Set1$col <- colors[1]
+  venn_gp$SetText$Set2$col <- colors[2]
+  venn_gp$SetText$Set3$col <- colors[3]
+  venn_gp$SetText$Set4$col <- colors[4]
+  venn_gp$SetText$Set5$col <- colors[5]
+  venn_gp$SetText$Set6$col <- colors[6]
+
+  return(venn_gp)
 }
