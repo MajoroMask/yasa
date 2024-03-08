@@ -1457,7 +1457,7 @@
       "RemoteUsername": "MajoroMask",
       "RemoteRepo": "esquisse",
       "RemoteRef": "master",
-      "RemoteSha": "9c929bbc873e37ad05783c300ab625677d689bcb",
+      "RemoteSha": "d6be9238b7becc23b032cf8b9875e92e15874a64",
       "Requirements": [
         "bslib",
         "datamods",
@@ -1473,7 +1473,7 @@
         "shinyWidgets",
         "shinybusy"
       ],
-      "Hash": "533de2e6fa6b1669941e1da7eaef503f"
+      "Hash": "4b17f47436ce2d64e319d6b2bdf274da"
     },
     "evaluate": {
       "Package": "evaluate",
