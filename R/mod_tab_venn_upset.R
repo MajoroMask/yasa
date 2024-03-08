@@ -498,6 +498,12 @@ mod_tab_venn_upset_server <- function(id){
 
 # utils ----
 
+
+#' update_venn_color
+#'
+#' @noRd
+#'
+#' @import ggsci
 update_venn_color <- function(venn_gp, ggsci_pal_name) {
   requireNamespace("ggsci", quietly = TRUE)
 
