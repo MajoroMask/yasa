@@ -1818,6 +1818,19 @@
       ],
       "Hash": "cc3361e234c4a5050e29697d675764aa"
     },
+    "ggsci": {
+      "Package": "ggsci",
+      "Version": "3.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "ggplot2",
+        "grDevices",
+        "scales"
+      ],
+      "Hash": "178a0ec3106797b702b8079afe3f0f89"
+    },
     "ggside": {
       "Package": "ggside",
       "Version": "0.2.3",
@@ -2393,6 +2406,21 @@
         "stats"
       ],
       "Hash": "f04948de84602afc23bfa9f5427e954d"
+    },
+    "lobstr": {
+      "Package": "lobstr",
+      "Version": "1.1.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "cpp11",
+        "crayon",
+        "methods",
+        "prettyunits",
+        "rlang"
+      ],
+      "Hash": "f2a94f8fc9db382a642e965339635ad6"
     },
     "magrittr": {
       "Package": "magrittr",
@@ -3009,6 +3037,21 @@
         "stats"
       ],
       "Hash": "0d8a15c9d000970ada1ab21405387dee"
+    },
+    "pryr": {
+      "Package": "pryr",
+      "Version": "0.1.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "codetools",
+        "lobstr",
+        "methods",
+        "stringr"
+      ],
+      "Hash": "cfcbe960eca81ceca61df5fa622693de"
     },
     "ps": {
       "Package": "ps",
