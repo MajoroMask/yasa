@@ -237,7 +237,7 @@ mod_subtab_is_calibration_server <- function(id) {
       }
     )
 
-    output$download_test_data_iscal_pep <- shiny::downloadHandler(
+    output$download_test_data_iscal_is <- shiny::downloadHandler(
       filename = "iscal_is.xlsx",
       content = function(file) {
         file.copy(

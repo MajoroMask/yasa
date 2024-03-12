@@ -16,7 +16,8 @@ mod_main_page_ui <- function(id){
         header = main_page_header(ns),
         sidebar = main_page_sidebar(ns),
         body = main_page_body(ns),
-        controlbar = NULL
+        controlbar = NULL,
+        skin = "blue"
       )
     )
   return(ui)
@@ -46,7 +47,11 @@ mod_main_page_server <- function(id){
 #' @importFrom shinydashboardPlus dashboardHeader
 main_page_header <- function(ns) {
   shinydashboardPlus::dashboardHeader(
-    disable = TRUE
+    title = tagList(
+      span(class = "logo-lg", "湖州申科 shenkebio"),
+      img(src = "www/HZSKBIO.svg")
+    ),
+    fixed = TRUE
   )
 }
 
@@ -100,7 +105,7 @@ main_page_sidebar <- function(ns) {
     ),
     id = "main_page_sidebar",
     collapsed = FALSE,
-    minified = FALSE
+    minified = TRUE
   )
 }
 

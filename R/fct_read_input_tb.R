@@ -11,7 +11,7 @@
 #' @importFrom tibble as_tibble
 #' @importFrom vroom vroom
 read_input_tb <- function(file,
-                          col_names,
+                          col_names = TRUE,
                           ...) {
   if (fs::path_ext(file) == "xlsx") {
     tb_out <-
