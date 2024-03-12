@@ -2,7 +2,7 @@
 # To deploy, run: rsconnect::deployApp()
 # Or use the blue button on top of this file
 
-options(shiny.port = 3838, shiny.host = '0.0.0.0')
+options(shiny.port = 3839, shiny.host = '0.0.0.0')
 
 library(yasa)
 
