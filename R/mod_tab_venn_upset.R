@@ -269,6 +269,8 @@ mod_tab_venn_upset_server <- function(id){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    rv_venn_plot <- rv(plot = NULL)
+
     # input data
     venn_data <- reactive({
       inFile <- input$file_venn
@@ -322,8 +324,10 @@ mod_tab_venn_upset_server <- function(id){
     })
 
     get_venn_gp <- reactive({
+      req(rv_venn_plot$plot)
+
       venn_gp <-
-        Vennerable::compute.Venn(venn_combinations()) %>%
+        rv_venn_plot$plot %>%
         Vennerable::VennThemes()
 
       venn_gp$SetText <- lapply(
@@ -432,6 +436,8 @@ mod_tab_venn_upset_server <- function(id){
           venn_plot@IndicatorWeight[, ".Weight"] <- venn_label_pct
         }
 
+        rv_venn_plot$plot <- venn_plot
+
         plot(
           venn_plot,
           gp = get_venn_gp(),
@@ -448,6 +454,8 @@ mod_tab_venn_upset_server <- function(id){
         paste("Venn_diagram", tolower(input$venn_filetype), sep = ".")
       },
       content = function(file) {
+        req(rv_venn_plot$plot)
+
         width <- input$venn_size
         height <- input$venn_size
         pixelratio <- 2
@@ -473,10 +481,8 @@ mod_tab_venn_upset_server <- function(id){
           pdf(file, width = 8, height = 8)
         }
         plot(
-          venn_combinations(),
-          doWeights = input$doWeights,
-          doEuler = FALSE,
-          type = get_venn_type(),
+          rv_venn_plot$plot,
+          gp = get_venn_gp(),
           show = list(Universe = FALSE)
         )
         dev.off()
