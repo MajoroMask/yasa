@@ -1,6 +1,6 @@
 Package: yasa
 Title: yasa ain't stable app
-Version: 0.0.0.9004
+Version: 0.0.0.9005
 Authors@R: 
     person("Su", "Na", , "nas@shenkebio.com", role = c("cre", "aut"))
 Description: A shiny app for proteome team @shenkebio.
@@ -20,6 +20,7 @@ Imports:
     shiny (>= 1.8.0),
     shinydashboard,
     shinydashboardPlus,
+    shinyWidgets,
     stringr,
     tibble,
     tidyr,

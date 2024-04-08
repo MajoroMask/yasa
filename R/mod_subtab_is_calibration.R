@@ -13,7 +13,11 @@ mod_subtab_is_calibration_ui <- function(id){
 
   shinydashboard::tabItem(
     tabName = "is_calibration",
-    h2(i18n("IS Calibration")),
+
+    br(),
+    br(),
+    # h2(i18n("IS Calibration")),
+
     shiny::fluidRow(
       shinydashboardPlus::box(
         title = i18n("Data upload & settings"),

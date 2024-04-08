@@ -6,7 +6,6 @@ Data upload & settings,数据和参数设置
 Upload data,上传数据
 Upload file,上传文件
 Header line in data,数据中包含标题行
-Venn diagram example data,文氏图示例数据
 Settings,参数设置
 Select sets,选择组别
 Classical venn,经典文氏图
@@ -37,12 +36,14 @@ Set6,集合6
 Label font size,标签大小
 Number font size,数字大小
 Plot & Usage Instructions,绘图和使用说明
+Plots & Usage Instructions,绘图和使用说明
 Choose output file type:,选择结果保存格式
 Download Plot,下载做图结果
 Usage Instructions,使用说明
 Venn diagram type,文氏图类型
 Utilities,小工具
 IS Calibration,内参校正
+HCP IS Calibration,HCP内参校正
 Output & Usage Instructions,结果和使用说明
 Upload protein list,上传蛋白列表
 Protein list example data,蛋白列表示例数据
@@ -54,3 +55,26 @@ Unit in IS table,内参表单位
 Drop IS Top2,启用“Drop Top2”模式
 Table Output preview,结果表格预览
 Download Table,下载表格
+HCP analysis,HCP分析
+Download example data,下载测试数据
+Molecular weight transformation,分子量变换
+MW transformation,分子量变换
+Abundance transformation,信号强度变换
+High-risk protein warning,高风险蛋白提示
+Filter data,数据过滤
+Download output,结果下载
+Download bubble plot,下载气泡图
+Download statistical results,下载统计结果
+Abundance data mode,丰度数据模式
+intensity,信号强度
+ratio,丰度比
+Select by column name,按列名选取
+Select case abundance,选择实验组信号强度
+Select control abundance,选择对照组信号强度
+Select case/control ratio,选择实验/对照信号强度比
+Select protein accession,选择蛋白ID
+Select molecular weight (MW),选择蛋白分子量
+Select isoelectric point (pI),选择蛋白等电点
+Bubble plot & Usage Instructions,气泡图 & 使用说明
+Bubble plot,气泡图
+Top differential HCPs,排名靠前的HCP

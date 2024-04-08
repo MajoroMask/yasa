@@ -41,12 +41,15 @@ options(repos = BiocManager::repositories())
 attachment::att_amend_desc()
 usethis::use_package("shinydashboard")
 usethis::use_package("shinydashboardPlus")
+usethis::use_package("shinyWidgets")
 usethis::use_package("esquisse")
 usethis::use_package("datamods")
+
 usethis::use_package("fs")
 usethis::use_package("purrr")
 usethis::use_package("vroom")
 usethis::use_package("tibble")
+usethis::use_package("tidyr")
 usethis::use_package("stringr")
 usethis::use_package("magrittr")
 usethis::use_package("colourpicker")
@@ -55,7 +58,9 @@ usethis::use_package("DT")
 usethis::use_package("scales")
 
 usethis::use_package("Vennerable", type = "Depends")
+# usethis::use_package("ggVennDiagram")
 usethis::use_package("dplyr", type = "Depends")
+usethis::use_package("ggplot2", type = "Depends")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -67,6 +72,7 @@ golem::add_module(name = "tab_basic_plot", with_test = TRUE)
 golem::add_module(name = "tab_venn_upset", with_test = TRUE)
 golem::add_module(name = "tab_utilities", with_test = TRUE)
 golem::add_module(name = "subtab_is_calibration", with_test = TRUE)
+golem::add_module(name = "subtab_hcp_visual", with_test = TRUE)
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*

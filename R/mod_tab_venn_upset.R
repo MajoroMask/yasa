@@ -18,7 +18,9 @@ mod_tab_venn_upset_ui <- function(id){
   shinydashboard::tabItem(
     tabName = "venn_upset",
 
-    h2(i18n("Venn diagrams")),
+    br(),
+    br(),
+    # h2(i18n("Venn diagrams")),
 
     shiny::fluidRow(
       shinydashboardPlus::box(
@@ -53,7 +55,7 @@ mod_tab_venn_upset_ui <- function(id){
             br(),
             shiny::downloadLink(
               ns("download_test_data_venn"),
-              label = i18n("Venn diagram example data"),
+              label = i18n("Download example data"),
             )
           ),
 
@@ -271,7 +273,8 @@ mod_tab_venn_upset_server <- function(id){
 
     rv_venn_plot <- rv(plot = NULL)
 
-    # input data
+    # input init ----
+
     venn_data <- reactive({
       inFile <- input$file_venn
 
@@ -407,6 +410,8 @@ mod_tab_venn_upset_server <- function(id){
       return(input$venn_size)
     })
 
+    # plot ----
+
     output$venn_plot <- renderPlot(
       expr = {
 
@@ -449,6 +454,8 @@ mod_tab_venn_upset_server <- function(id){
       outputArgs = list()
     )
 
+    # download ----
+
     output$download_venn_output <- downloadHandler(
       filename = function() {
         paste("Venn_diagram", tolower(input$venn_filetype), sep = ".")
@@ -489,7 +496,6 @@ mod_tab_venn_upset_server <- function(id){
       }
     )
 
-    # test data to download
     output$download_test_data_venn <- shiny::downloadHandler(
       filename = "venn_example_data.xlsx",
       content = function(file) {
