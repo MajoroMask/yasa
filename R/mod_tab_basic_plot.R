@@ -15,14 +15,20 @@ mod_tab_basic_plot_ui <- function(id){
 
   shinydashboard::tabItem(
     tabName = "basic_plot",
+    br(),
+    br(),
     shiny::fluidRow(
       shinydashboardPlus::box(
+        id = "box-hide-title",
         width = 12,
+        status = "warning",
         esquisse::esquisse_ui(
           ns("my_esquisse"),
           container = esquisse::esquisseContainer(height = "850px")
         )
-      )
+      ),
+      tags$head(tags$style('#box-hide-title .box-header{ display: none }'))
+      # hide box title with in-line css
     )
   )
 }

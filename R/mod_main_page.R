@@ -35,6 +35,8 @@ mod_main_page_server <- function(id){
     mod_tab_venn_upset_server("tab_venn_upset")
 
     mod_subtab_is_calibration_server("is_calibration")
+
+    mod_subtab_hcp_visual_server("hcp_visual")
   })
 }
 
@@ -85,22 +87,47 @@ main_page_sidebar <- function(ns) {
         badgeColor = "green",
         icon = icon("hand-spock", class = "fa-solid", lib = "font-awesome")
       ),
+      # shinydashboard::menuItem(
+      #   text = i18n("Utilities"),
+      #   tabName = "utilities",
+      #   expandedName = "utilities_expand",
+      #   newtab = FALSE,
+      #   selected = FALSE,
+      #   badgeLabel = NULL,
+      #   badgeColor = "green",
+      #   icon = icon("toolbox", class = "fa-solid", lib = "font-awesome"),
+      #   shinydashboard::menuSubItem(
+      #     text = i18n("IS Calibration"),
+      #     tabName = "is_calibration",
+      #     newtab = FALSE,
+      #     selected = FALSE,
+      #     icon = icon("calculator", class = "fa-solid", lib = "font-awesome")
+      #   ),
+      #   shinydashboard::menuSubItem(
+      #     text = i18n("HCP analysis"),
+      #     tabName = "hcp_visual",
+      #     newtab = FALSE,
+      #     selected = FALSE,
+      #     icon = icon("dice-d20", class = "fa-solid", lib = "font-awesome")
+      #   )
+      # )
       shinydashboard::menuItem(
-        text = i18n("Utilities"),
-        tabName = "utilities",
-        expandedName = "utilities_expand",
+        text = i18n("HCP IS Calibration"),
+        tabName = "is_calibration",
         newtab = FALSE,
         selected = FALSE,
         badgeLabel = NULL,
         badgeColor = "green",
-        icon = icon("toolbox", class = "fa-solid", lib = "font-awesome"),
-        shinydashboard::menuSubItem(
-          text = i18n("IS Calibration"),
-          tabName = "is_calibration",
-          newtab = FALSE,
-          selected = FALSE,
-          icon = icon("calculator", class = "fa-solid", lib = "font-awesome")
-        )
+        icon = icon("calculator", class = "fa-solid", lib = "font-awesome")
+      ),
+      shinydashboard::menuItem(
+        text = i18n("HCP analysis"),
+        tabName = "hcp_visual",
+        newtab = FALSE,
+        selected = FALSE,
+        badgeLabel = NULL,
+        badgeColor = "green",
+        icon = icon("dice-d20", class = "fa-solid", lib = "font-awesome")
       )
     ),
     id = "main_page_sidebar",
@@ -119,7 +146,8 @@ main_page_body <- function(ns) {
     shinydashboard::tabItems(
       mod_tab_basic_plot_ui(ns("tab_basic_plot")),
       mod_tab_venn_upset_ui(ns("tab_venn_upset")),
-      mod_subtab_is_calibration_ui(ns("is_calibration"))
+      mod_subtab_is_calibration_ui(ns("is_calibration")),
+      mod_subtab_hcp_visual_ui(ns("hcp_visual"))
     )
   )
 }
