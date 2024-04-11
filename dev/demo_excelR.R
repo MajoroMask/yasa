@@ -1,6 +1,7 @@
 
 library(shiny)
 library(excelR)
+library(shiny.semantic)
 library(semantic.dashboard)
 
 library(forcats)
