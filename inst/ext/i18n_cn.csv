@@ -78,3 +78,8 @@ Select isoelectric point (pI),选择蛋白等电点
 Bubble plot & Usage Instructions,气泡图 & 使用说明
 Bubble plot,气泡图
 Top differential HCPs,排名靠前的HCP
+Case color,实验组颜色
+Control color,对照组颜色
+Bubble alpha,气泡透明度
+Bubble border (no border when 0),气泡边框（设为0时无边框）
+Bubble size range,气泡大小范围
