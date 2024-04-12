@@ -20,9 +20,11 @@ mod_tab_venn_upset_ui <- function(id){
 
     br(),
     br(),
-    # h2(i18n("Venn diagrams")),
 
     shiny::fluidRow(
+
+      # upper left box ----
+
       shinydashboardPlus::box(
         title = i18n("Data upload & settings"),
         width = 4,
@@ -32,7 +34,8 @@ mod_tab_venn_upset_ui <- function(id){
           height = "100%",
           width = "100%",
 
-          # upload tab
+          ## upload tab ----
+
           shiny::tabPanel(
             title = i18n("Upload data"),
             shiny::fileInput(
@@ -59,7 +62,8 @@ mod_tab_venn_upset_ui <- function(id){
             )
           ),
 
-          # setting tab
+          ## setting tab ----
+
           shiny::tabPanel(
             title = i18n("Settings"),
             shiny::htmlOutput(ns("venn_data_sets")),
@@ -119,7 +123,8 @@ mod_tab_venn_upset_ui <- function(id){
             )
           ),
 
-          # color & font setting
+          ## color & font setting ----
+
           shiny::tabPanel(
             title = i18n("Color & Font"),
             shiny::selectInput(
@@ -208,10 +213,16 @@ mod_tab_venn_upset_ui <- function(id){
           )
         )
       ),
+
+      # upper right box ----
+
       shinydashboardPlus::box(
         title = i18n("Plot & Usage Instructions"),
         status = "warning",
         width = 8,
+
+        ## plot tab ----
+
         shinydashboard::tabBox(
           id = ns("venn_tab_plot"),
           height = "100%",
@@ -238,6 +249,9 @@ mod_tab_venn_upset_ui <- function(id){
               )
             )
           ),
+
+          ## docs tab ----
+
           shiny::tabPanel(
             title = i18n("Usage Instructions"),
             h4("Instructions for Venn diagram module"),

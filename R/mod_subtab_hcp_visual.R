@@ -21,12 +21,13 @@ mod_subtab_hcp_visual_ui <- function(id){
     tabName = "hcp_visual",
     br(),
     br(),
-    # h2(i18n("HCP analysis")),
 
     # 1st row ----
+
     shiny::fluidRow(
 
       ## upper left box ----
+
       shinydashboardPlus::box(
         title = i18n("Data upload & settings"),
         width = 4,
@@ -38,13 +39,9 @@ mod_subtab_hcp_visual_ui <- function(id){
           width = "100%",
 
           ### upload tab ----
+
           shiny::tabPanel(
             title = i18n("Upload data"),
-            # shiny::fileInput(
-            #   ns("file_hcp_input"),
-            #   label = i18n("Upload protein list"),
-            #   accept = c(".xlsx")
-            # ),
             shinyWidgets::actionBttn(
               inputId = ns("launch_import_modal"),
               label = i18n("Click to import data"),
@@ -61,6 +58,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ### setting tab ----
+
           shiny::tabPanel(
             title = i18n("Settings"),
             shiny::selectInput(
@@ -132,6 +130,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ### filtering tab ----
+
           shiny::tabPanel(
             title = i18n("Filter data"),
             datamods::filter_data_ui(
@@ -142,6 +141,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ### output tab ----
+
           shiny::tabPanel(
             title = i18n("Download output"),
             # TODO add in-line instruction
@@ -160,6 +160,7 @@ mod_subtab_hcp_visual_ui <- function(id){
       ),
 
       ## upper right box ----
+
       shinydashboardPlus::box(
         title = i18n("Plots & Usage Instructions"),
         width = 8,
@@ -202,20 +203,8 @@ mod_subtab_hcp_visual_ui <- function(id){
     ),
 
     # 2nd row ----
-    shiny::fluidRow(
-      ## lower left box ----
-      # shinydashboardPlus::box(
-      #   title = i18n("Venn diagram"),
-      #   width = 4,
-      #   status = "warning",
-      #   plotOutput(
-      #     ns("hcp_venn"),
-      #     width = validateCssUnit("100%"),
-      #     height = validateCssUnit("500px")
-      #   )
-      # ),
 
-      ## lower right box ----
+    shiny::fluidRow(
       shinydashboardPlus::box(
         title = i18n("Top differential HCPs"),
         width = 12,
@@ -227,22 +216,6 @@ mod_subtab_hcp_visual_ui <- function(id){
         )
       )
     )
-
-    # 3rd row ----
-    # shiny::fluidRow(
-    #   shinydashboardPlus::box(
-    #     title = i18n("Playground"),
-    #     width = 6,
-    #     status = "danger",
-    #     shiny::verbatimTextOutput(ns("test01"))
-    #   ),
-    #   shinydashboardPlus::box(
-    #     title = i18n("Another playground"),
-    #     width = 6,
-    #     status = "danger",
-    #     shiny::verbatimTextOutput(ns("test02"))
-    #   ),
-    # )
   )
 }
 
@@ -275,25 +248,9 @@ mod_subtab_hcp_visual_server <- function(id) {
       tb_display = NULL,  # tb displayed after filtering & plotly selecting
       p_venn = NULL,  # venn diagram from Vennerable
       stats_table_one = NULL  # table one
-      # TODO add more if needed
     )
 
     rv_dummy_bubble <- rv(plot = NULL)  # bubble plot for saving
-
-    # rv_hcp$tb_input <- reactive({
-    #   if (!is.null(input$file_hcp_input)) {
-    #     tb <-
-    #       read_input_tb(input$file_hcp_input$datapath) %>%
-    #       add_hidden_index()
-    #   } else {
-    #     # tb <-
-    #     #   system.file("ext/hcp_example_data.xlsx", package = "yasa") %>%
-    #     #   read_input_tb() %>%
-    #     #   add_hidden_index()
-    #     tb <- NULL
-    #   }
-    #   tb
-    # })
 
     ob_import_modal <-
       observe({
@@ -594,17 +551,15 @@ mod_subtab_hcp_visual_server <- function(id) {
           xaxis = list(
             title = "pI",
             layer = "below traces",
-            # gridcolor = 'rgb(255, 255, 255)'
             gridcolor = 'rgb(200, 200, 200)'
           ),
           yaxis = list(
             title = rename_case_match("MW", mw_trans),
             layer = "below traces",
-            # gridcolor = 'rgb(255, 255, 255)'
             gridcolor = 'rgb(200, 200, 200)'
-          )
-          # paper_bgcolor = "rgb(243, 243, 243)",
-          # plot_bgcolor = "rgb(243, 243, 243)"
+          ),
+          paper_bgcolor = "rgb(255, 255, 255)",
+          plot_bgcolor = "rgb(255, 255, 255)"
         ) %>%
         plotly::event_register("plotly_selecting")
 
@@ -629,12 +584,12 @@ mod_subtab_hcp_visual_server <- function(id) {
         ggplot2::theme(
           legend.title = element_blank(),
           legend.justification = c("right", "top"),
-          # legend.background = element_rect(fill = "#f3f3f3"),
-          # legend.key = element_rect(fill = "#f3f3f3"),
-          # panel.background = element_rect(fill = "#f3f3f3"),
+          legend.background = element_rect(fill = "#ffffff"),
+          legend.key = element_rect(fill = "#ffffff"),
+          panel.background = element_rect(fill = "#ffffff"),
           panel.border = element_blank(),
-          panel.grid = element_line(color = "#c8c8c8")
-          # plot.background = element_rect(fill = "#f3f3f3")
+          panel.grid = element_line(color = "#c8c8c8"),
+          plot.background = element_rect(fill = "#ffffff")
         ) +
         labs(
           x = "pI",
