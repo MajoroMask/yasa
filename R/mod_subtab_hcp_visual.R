@@ -13,6 +13,7 @@
 #' @importFrom shinyWidgets switchInput
 #' @importFrom datamods filter_data_ui
 #' @importFrom plotly plotlyOutput
+#' @importFrom colourpicker colourInput
 mod_subtab_hcp_visual_ui <- function(id){
   ns <- NS(id)
 
@@ -20,38 +21,44 @@ mod_subtab_hcp_visual_ui <- function(id){
     tabName = "hcp_visual",
     br(),
     br(),
-    # h2(i18n("HCP analysis")),
 
     # 1st row ----
+
     shiny::fluidRow(
 
       ## upper left box ----
+
       shinydashboardPlus::box(
         title = i18n("Data upload & settings"),
         width = 4,
         status = "warning",
+        style = "overflow-y: scroll; height: 600px;",
         shinydashboard::tabBox(
           id = ns("hcp_tab_setting"),
           height = "100%",
           width = "100%",
 
           ### upload tab ----
+
           shiny::tabPanel(
             title = i18n("Upload data"),
-            shiny::fileInput(
-              ns("file_hcp_input"),
-              label = i18n("Upload protein list"),
-              accept = c(".xlsx")
+            shinyWidgets::actionBttn(
+              inputId = ns("launch_import_modal"),
+              label = i18n("Click to upload data"),
+              style = "bordered",
+              block = TRUE,
+              color = "success",
+              icon = icon("sliders")
             ),
+            shiny::uiOutput(ns("ui_column_selection")),
             shiny::downloadLink(
               ns("download_test_data_hcp"),
               label = i18n("Download example data"),
-            ),
-            br(),
-            shiny::uiOutput(ns("ui_column_selection"))
+            )
           ),
 
           ### setting tab ----
+
           shiny::tabPanel(
             title = i18n("Settings"),
             shiny::selectInput(
@@ -82,10 +89,48 @@ mod_subtab_hcp_visual_ui <- function(id){
                 "None" = "none"
               ),
               selected = "none"
+            ),
+            colourpicker::colourInput(
+              ns("case_color"),
+              label = i18n("Case color"),
+              value = "#1972A4"
+            ),
+            colourpicker::colourInput(
+              ns("control_color"),
+              label = i18n("control color"),
+              value = "#C61951"
+            ),
+            shiny::sliderInput(
+              ns("bubble_alpha"),
+              label = i18n("Bubble alpha"),
+              value = 0.4,
+              min = 0.0,
+              max = 1.0,
+              ticks = TRUE,
+              step = 0.05
+            ),
+            shiny::sliderInput(
+              ns("bubble_size_range"),
+              label = i18n("Bubble size range"),
+              value = c(10, 1000),
+              min = 0,
+              max = 2000,
+              ticks = TRUE,
+              step = 1
+            ),
+            shiny::sliderInput(
+              ns("bubble_border"),
+              label = i18n("Bubble border (no border when 0)"),
+              value = 0,
+              min = 0.0,
+              max = 2,
+              ticks = TRUE,
+              step = 0.1
             )
           ),
 
           ### filtering tab ----
+
           shiny::tabPanel(
             title = i18n("Filter data"),
             datamods::filter_data_ui(
@@ -96,6 +141,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ### output tab ----
+
           shiny::tabPanel(
             title = i18n("Download output"),
             # TODO add in-line instruction
@@ -114,10 +160,12 @@ mod_subtab_hcp_visual_ui <- function(id){
       ),
 
       ## upper right box ----
+
       shinydashboardPlus::box(
         title = i18n("Plots & Usage Instructions"),
         width = 8,
         status = "warning",
+        style = "height: 600px;",
         shinydashboard::tabBox(
           id = ns("hcp_tab_plot"),
           height = "100%",
@@ -129,7 +177,7 @@ mod_subtab_hcp_visual_ui <- function(id){
             plotly::plotlyOutput(
               ns("hcp_bubble"),
               width = "100%",
-              height = "550px"
+              height = "490px"
             )
           ),
 
@@ -155,20 +203,8 @@ mod_subtab_hcp_visual_ui <- function(id){
     ),
 
     # 2nd row ----
-    shiny::fluidRow(
-      ## lower left box ----
-      # shinydashboardPlus::box(
-      #   title = i18n("Venn diagram"),
-      #   width = 4,
-      #   status = "warning",
-      #   plotOutput(
-      #     ns("hcp_venn"),
-      #     width = validateCssUnit("100%"),
-      #     height = validateCssUnit("500px")
-      #   )
-      # ),
 
-      ## lower right box ----
+    shiny::fluidRow(
       shinydashboardPlus::box(
         title = i18n("Top differential HCPs"),
         width = 12,
@@ -180,22 +216,6 @@ mod_subtab_hcp_visual_ui <- function(id){
         )
       )
     )
-
-    # 3rd row ----
-    # shiny::fluidRow(
-    #   shinydashboardPlus::box(
-    #     title = i18n("Playground"),
-    #     width = 6,
-    #     status = "danger",
-    #     shiny::verbatimTextOutput(ns("test01"))
-    #   ),
-    #   shinydashboardPlus::box(
-    #     title = i18n("Another playground"),
-    #     width = 6,
-    #     status = "danger",
-    #     shiny::verbatimTextOutput(ns("test02"))
-    #   ),
-    # )
   )
 }
 
@@ -228,24 +248,33 @@ mod_subtab_hcp_visual_server <- function(id) {
       tb_display = NULL,  # tb displayed after filtering & plotly selecting
       p_venn = NULL,  # venn diagram from Vennerable
       stats_table_one = NULL  # table one
-      # TODO add more if needed
     )
 
     rv_dummy_bubble <- rv(plot = NULL)  # bubble plot for saving
 
+    ob_import_modal <-
+      observe({
+        datamods::import_modal(
+          id = ns("import_data"),
+          from = c("file", "copypaste", "url"),
+          title = i18n("Import data to create a graph")
+        )
+      }) %>%
+      bindEvent(input$launch_import_modal)
+
+    rv_imported_data <- datamods::import_server(
+      "import_data",
+      allowed_status = "OK",
+      return_class = "tbl_df"
+    )
+
     rv_hcp$tb_input <- reactive({
-      if (!is.null(input$file_hcp_input)) {
-        tb <-
-          read_input_tb(input$file_hcp_input$datapath) %>%
-          add_hidden_index()
-      } else {
-        # tb <-
-        #   system.file("ext/hcp_example_data.xlsx", package = "yasa") %>%
-        #   read_input_tb() %>%
-        #   add_hidden_index()
-        tb <- NULL
-      }
-      tb
+      req(rv_imported_data$data())
+
+      tb_input <-
+        rv_imported_data$data() %>%
+        add_hidden_index()
+      tb_input
     })
 
     rv_hcp$origin_colnames <- reactive({
@@ -267,11 +296,15 @@ mod_subtab_hcp_visual_server <- function(id) {
         shinyWidgets::pickerInput(
           ns("col_abun_case"),
           label = i18n("Select case abundance"),
-          choices = prioritize_colnames(
-            ocn,
-            pattern = "(?=.*Abundance.*)(?!.*Ratio.*)",
-            ignore_case = TRUE
-          ),
+          choices =
+            tbi %>%
+            select(-.idx) %>%
+            select(where(~ is.double(.x) | is.integer(.x))) %>%
+            colnames() %>%
+            prioritize_colnames(
+              pattern = "(?=.*Abundance.*)(?!.*Ratio.*)",
+              ignore_case = TRUE
+            ),
           options = list(
             title = i18n("Select by column name"),
             `live-search` = TRUE,
@@ -281,11 +314,15 @@ mod_subtab_hcp_visual_server <- function(id) {
         shinyWidgets::pickerInput(
           ns("col_abun_control"),
           label = i18n("Select control abundance"),
-          choices = prioritize_colnames(
-            ocn,
-            pattern = "(?=.*Abundance.*)(?!.*Ratio.*)",
-            ignore_case = TRUE
-          ),
+          choices =
+            tbi %>%
+            select(-.idx) %>%
+            select(where(~ is.double(.x) | is.integer(.x))) %>%
+            colnames() %>%
+            prioritize_colnames(
+              pattern = "(?=.*Abundance.*)(?!.*Ratio.*)",
+              ignore_case = TRUE
+            ),
           options = list(
             title = i18n("Select by column name"),
             `live-search` = TRUE,
@@ -295,11 +332,15 @@ mod_subtab_hcp_visual_server <- function(id) {
         shinyWidgets::pickerInput(
           ns("col_abun_ratio"),
           label = i18n("Select case/control ratio"),
-          choices = prioritize_colnames(
-            ocn,
-            pattern = "Abundance Ratio",
-            ignore_case = TRUE
-          ),
+          choices =
+            tbi %>%
+            select(-.idx) %>%
+            select(where(~ is.double(.x) | is.integer(.x))) %>%
+            colnames() %>%
+            prioritize_colnames(
+              pattern = "Abundance Ratio",
+              ignore_case = TRUE
+            ),
           options = list(
             title = i18n("Select by column name"),
             `live-search` = TRUE,
@@ -309,11 +350,15 @@ mod_subtab_hcp_visual_server <- function(id) {
         shinyWidgets::pickerInput(
           ns("col_acc"),
           label = i18n("Select protein accession"),
-          choices = prioritize_colnames(
-            ocn,
-            pattern = "Accession",
-            ignore_case = TRUE
-          ),
+          choices =
+            tbi %>%
+            select(-.idx) %>%
+            select(where(~ is.character(.x) | is.factor(.x))) %>%
+            colnames() %>%
+            prioritize_colnames(
+              pattern = "Accession",
+              ignore_case = TRUE
+            ),
           selected = "Accession",
           options = list(
             title = i18n("Select by column name"),
@@ -324,11 +369,15 @@ mod_subtab_hcp_visual_server <- function(id) {
         shinyWidgets::pickerInput(
           ns("col_mw"),
           label = i18n("Select molecular weight (MW)"),
-          choices = prioritize_colnames(
-            ocn,
-            pattern = "(molecular weight)|(MW)",
-            ignore_case = FALSE
-          ),
+          choices =
+            tbi %>%
+            select(-.idx) %>%
+            select(where(~ is.double(.x) | is.integer(.x))) %>%
+            colnames() %>%
+            prioritize_colnames(
+              pattern = "(molecular weight)|(MW)",
+              ignore_case = FALSE
+            ),
           selected = "MW [kDa]",
           options = list(
             title = i18n("Select by column name"),
@@ -339,11 +388,15 @@ mod_subtab_hcp_visual_server <- function(id) {
         shinyWidgets::pickerInput(
           ns("col_pi"),
           label = i18n("Select isoelectric point (pI)"),
-          choices = prioritize_colnames(
-            ocn,
-            pattern = "pI",
-            ignore_case = FALSE
-          ),
+          choices =
+            tbi %>%
+            select(-.idx) %>%
+            select(where(~ is.double(.x) | is.integer(.x))) %>%
+            colnames() %>%
+            prioritize_colnames(
+              pattern = "pI",
+              ignore_case = FALSE
+            ),
           selected = "calc. pI",
           options = list(
             title = i18n("Select by column name"),
@@ -446,6 +499,11 @@ mod_subtab_hcp_visual_server <- function(id) {
     output$hcp_bubble <- plotly::renderPlotly({
       req(rv_hcp$tb_plot())
       req(input$mw_trans)
+      req(input$case_color)
+      req(input$control_color)
+      req(input$bubble_alpha)
+      req(input$bubble_size_range)
+      req(input$bubble_border)
 
       mw_trans <- input$mw_trans
 
@@ -465,16 +523,16 @@ mod_subtab_hcp_visual_server <- function(id) {
           y = ~ mw,
 
           color = ~ sample,
-          colors = c("#1972A4", "#C61951"),
+          colors = c(input$case_color, input$control_color),
           size = ~ abun_filled,
-          sizes = c(20, 200),
+          sizes = input$bubble_size_range,
           type = "scatter",
           mode = "markers",
           marker = list(
             symbol = "circle",
             sizemode = "area",
-            opacity = 0.4,
-            line = list(width = 1.5, color = "#FFFFFF")
+            opacity = input$bubble_alpha,
+            line = list(width = input$bubble_border, color = "#000000")
           ),
 
           hoverinfo = "text",
@@ -492,14 +550,16 @@ mod_subtab_hcp_visual_server <- function(id) {
           dragmode = "select",
           xaxis = list(
             title = "pI",
-            gridcolor = 'rgb(255, 255, 255)'
+            layer = "below traces",
+            gridcolor = 'rgb(200, 200, 200)'
           ),
           yaxis = list(
             title = rename_case_match("MW", mw_trans),
-            gridcolor = 'rgb(255, 255, 255)'
+            layer = "below traces",
+            gridcolor = 'rgb(200, 200, 200)'
           ),
-          paper_bgcolor = "rgb(243, 243, 243)",
-          plot_bgcolor = "rgb(243, 243, 243)"
+          paper_bgcolor = "rgb(255, 255, 255)",
+          plot_bgcolor = "rgb(255, 255, 255)"
         ) %>%
         plotly::event_register("plotly_selecting")
 
@@ -509,24 +569,27 @@ mod_subtab_hcp_visual_server <- function(id) {
         ggplot(tb_p) +
         geom_point(
           aes(pi, mw, fill = sample, size = abun_filled),
-          shape = "circle filled", alpha = I(0.4),
-          stroke = 1, color = "#ffffff"
+          shape = 21, alpha = I(input$bubble_alpha),
+          stroke = input$bubble_border, color = "#000000"
         ) +
         scale_fill_manual(
-          values = c(case = "#1972A4", control = "#C61951"),
+          values = c(case = input$case_color, control = input$control_color),
           guide = guide_legend(override.aes = list(size = 5))
         ) +
-        scale_size(guide = "none") +
+        scale_size(
+          guide = "none",
+          range = input$bubble_size_range * 0.025
+        ) +
         theme_bw() +
         ggplot2::theme(
           legend.title = element_blank(),
           legend.justification = c("right", "top"),
-          legend.background = element_rect(fill = "#f3f3f3"),
-          legend.key = element_rect(fill = "#f3f3f3"),
-          panel.background = element_rect(fill = "#f3f3f3"),
+          legend.background = element_rect(fill = "#ffffff"),
+          legend.key = element_rect(fill = "#ffffff"),
+          panel.background = element_rect(fill = "#ffffff"),
           panel.border = element_blank(),
-          panel.grid = element_line(color = "#ffffff"),
-          plot.background = element_rect(fill = "#f3f3f3")
+          panel.grid = element_line(color = "#c8c8c8"),
+          plot.background = element_rect(fill = "#ffffff")
         ) +
         labs(
           x = "pI",
@@ -607,7 +670,7 @@ mod_subtab_hcp_visual_server <- function(id) {
         # display points either:
         #   - passed the filter module
         #   - selected on plotly (they passed the filter, too)
-        if (isTruthy(plotly::event_data("plotly_selecting"))) {
+        if (length(plotly::event_data("plotly_selecting")) > 0L) {
           selecting_idx <-
             plotly::event_data("plotly_selecting") %>%
             dplyr::pull(customdata) %>%
@@ -651,13 +714,15 @@ mod_subtab_hcp_visual_server <- function(id) {
 
     ## save rigged bubble plot by ggplot2 ----
 
-    observeEvent(input$download_hcp_bubble, {
-      req(rv_dummy_bubble$plot)
-      esquisse::save_ggplot_modal(
-        ns("save_ggplot_bubble"),
-        title = i18n("Download Plot")
-      )
-    })
+    ob_save_plot <-
+      observe({
+        req(rv_dummy_bubble$plot)
+        esquisse::save_ggplot_modal(
+          ns("save_ggplot_bubble"),
+          title = i18n("Download Plot")
+        )
+      }) %>%
+      bindEvent(input$download_hcp_bubble)
 
     esquisse::save_ggplot_server(
       "save_ggplot_bubble",

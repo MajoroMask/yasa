@@ -20,9 +20,11 @@ mod_tab_venn_upset_ui <- function(id){
 
     br(),
     br(),
-    # h2(i18n("Venn diagrams")),
 
     shiny::fluidRow(
+
+      # upper left box ----
+
       shinydashboardPlus::box(
         title = i18n("Data upload & settings"),
         width = 4,
@@ -32,37 +34,47 @@ mod_tab_venn_upset_ui <- function(id){
           height = "100%",
           width = "100%",
 
-          # upload tab
+          ## upload tab ----
+
           shiny::tabPanel(
             title = i18n("Upload data"),
-            shiny::fileInput(
-              ns("file_venn"),
-              label = i18n("Upload file"),
-              accept = c(
-                "text/csv",
-                "text/comma-separated-values",
-                "text/tab-separated-values",
-                ".csv",
-                ".tsv",
-                ".xlsx"
-              )
-            ),
-            shiny::checkboxInput(
-              ns("header_venn"),
-              label = i18n("Header line in data"),
-              value = TRUE
+            shinyWidgets::actionBttn(
+              inputId = ns("launch_import_modal"),
+              label = i18n("Click to upload data"),
+              style = "bordered",
+              block = TRUE,
+              color = "success",
+              icon = icon("sliders")
             ),
             br(),
+            shinyWidgets::switchInput(
+              inputId = ns("venn_input_type"),
+              label = i18n("Input type"),
+              value = TRUE,
+              labelWidth = "100px",
+              onLabel = "PD",
+              offLabel = "venn list",
+              onStatus = "primary",
+              offStatus = "success"
+            ),
+            shiny::uiOutput(ns("ui_column_selection")),
+            br(),
             shiny::downloadLink(
-              ns("download_test_data_venn"),
-              label = i18n("Download example data"),
+              ns("download_test_data_venn_pd"),
+              label = i18n("Download example PD data"),
+            ),
+            tags$a(style = "display: inline-block;width: 20px;"),
+            shiny::downloadLink(
+              ns("download_test_data_venn_list"),
+              label = i18n("Download example venn list"),
             )
           ),
 
-          # setting tab
+          ## setting tab ----
+
           shiny::tabPanel(
             title = i18n("Settings"),
-            shiny::htmlOutput(ns("venn_data_sets")),
+            shiny::uiOutput(ns("venn_data_sets")),
             shiny::selectInput(
               ns("venn_type"),
               label = i18n("Venn diagram type"),
@@ -119,7 +131,8 @@ mod_tab_venn_upset_ui <- function(id){
             )
           ),
 
-          # color & font setting
+          ## color & font setting ----
+
           shiny::tabPanel(
             title = i18n("Color & Font"),
             shiny::selectInput(
@@ -191,27 +204,37 @@ mod_tab_venn_upset_ui <- function(id){
                 )
               )
             ),
-            shiny::numericInput(
+            shiny::sliderInput(
               ns("venn_labelsize"),
-              label = "Label font size",
+              label = i18n("Label font size"),
               value = 15,
               min = 1,
-              max = 50
+              max = 50,
+              ticks = TRUE,
+              step = 1
             ),
-            shiny::numericInput(
+            shiny::sliderInput(
               ns("venn_cex"),
-              label = "Number font size",
-              value = 1.5,
-              min = 0.5,
-              max = 20
+              label = i18n("Number font size"),
+              value = 3,
+              min = 0,
+              max = 10,
+              ticks = TRUE,
+              step = 0.1
             )
           )
         )
       ),
+
+      # upper right box ----
+
       shinydashboardPlus::box(
         title = i18n("Plot & Usage Instructions"),
         status = "warning",
         width = 8,
+
+        ## plot tab ----
+
         shinydashboard::tabBox(
           id = ns("venn_tab_plot"),
           height = "100%",
@@ -238,6 +261,9 @@ mod_tab_venn_upset_ui <- function(id){
               )
             )
           ),
+
+          ## docs tab ----
+
           shiny::tabPanel(
             title = i18n("Usage Instructions"),
             h4("Instructions for Venn diagram module"),
@@ -275,22 +301,106 @@ mod_tab_venn_upset_server <- function(id){
 
     # input init ----
 
-    venn_data <- reactive({
-      inFile <- input$file_venn
+    ob_import_modal <-
+      observe({
+        datamods::import_modal(
+          id = ns("import_data"),
+          from = c("file", "copypaste", "url"),
+          title = i18n("Upload PD file or venn list")
+        )
+      }) %>%
+      bindEvent(input$launch_import_modal)
 
-      if(!is.null(inFile)) {
-        data <-
-          read_input_tb(
-            input$file_venn$datapath,
-            col_names = input$header_venn
-          ) %>%
-          purrr::map(.f = ~ .x[!is.na(.x)])
-      } else {
-        data <-
+    rv_imported_data <- datamods::import_server(
+      "import_data",
+      allowed_status = "OK",
+      return_class = "tbl_df"
+    )
+
+    rv_input_type <- reactive({
+      ifelse(input$venn_input_type, "pd", "venn_list")
+    })
+
+    output$ui_column_selection <- renderUI({
+      req(rv_imported_data$data())
+      req(rv_input_type())
+
+      if (rv_input_type() == "pd") {
+        ui_out <- tagList(
+          shinyWidgets::pickerInput(
+            ns("cols_sets"),
+            label = i18n("Select sets data"),
+            choices =
+              rv_imported_data$data() %>%
+              select(where(~ is.character(.x) | is.factor(.x))) %>%
+              colnames() %>%
+              prioritize_colnames(
+                pattern = "^found in sample",
+                ignore_case = TRUE
+              ),
+            multiple = TRUE,
+            options = list(
+              title = i18n("Select by column name"),
+              `live-search` = TRUE,
+              size = 8
+            )
+          ),
+          shinyWidgets::materialSwitch(
+            ns("peak_found_as_positive"),
+            label = i18n('`Peak found` as positive'),
+            value = TRUE,
+            status = "primary"
+          )
+        )
+      }
+      if (rv_input_type() == "venn_list") {
+        ui_out <- tagList()
+      }
+      ui_out
+    })
+
+    venn_data <- reactive({
+      req(rv_input_type())
+
+      if (!isTruthy(rv_imported_data$data())) {
+        l_out <-
           system.file("ext/venn_example_data.xlsx", package = "yasa") %>%
-          read_input_tb(col_names = input$header_venn) %>%
+          read_input_tb(col_names = TRUE) %>%
+          purrr::map(.f = ~ .x[!is.na(.x)])
+      } else if (rv_input_type() == "pd") {
+        req(input$cols_sets)
+
+        l_out <-
+          rv_imported_data$data() %>%
+          select(all_of(input$cols_sets)) %>%
+          add_hidden_index() %>%
+          mutate(.idx = as.character(.idx)) %>%
+          rename_with(
+            .cols = -.idx,
+            .fn = ~ stringr::str_replace(
+              .x,
+              stringr::regex("found in sample\\:?", ignore_case = TRUE),
+              ""
+            )
+          ) %>%
+          mutate(
+            across(
+              .cols = -.idx,
+              .fns = ~ recode_found_in_sample(.x, input$peak_found_as_positive)
+            ),
+            across(
+              .cols = -.idx,
+              .fns = ~ if_else(is.na(.x), NA_character_, .idx)
+            )
+          ) %>%
+          select(-.idx) %>%
+          purrr::map(.f = ~ .x[!is.na(.x)])
+      } else if (rv_input_type() == "venn_list") {
+        l_out <-
+          rv_imported_data$data() %>%
           purrr::map(.f = ~ .x[!is.na(.x)])
       }
+      l_out
     })
 
     set_names <- reactive({
@@ -299,14 +409,18 @@ mod_tab_venn_upset_server <- function(id){
     })
 
     output$venn_data_sets <- renderUI({
-      selectInput(
-        ns("venn_sets_selected"),
-        label = i18n("Select sets"),
-        choices = as.character(set_names()),
-        multiple = TRUE,
-        selectize = TRUE,
-        selected = as.character(set_names()[1:5])
+      req(set_names())
+      ui_out <- tagList(
+        selectInput(
+          ns("venn_sets_selected"),
+          label = i18n("Select sets"),
+          choices = as.character(set_names()),
+          multiple = TRUE,
+          selectize = TRUE,
+          selected = as.character(set_names()[1:5])
+        )
       )
+      ui_out
     })
 
     venn_selected_names <- reactive({
@@ -343,7 +457,7 @@ mod_tab_venn_upset_server <- function(id){
       venn_gp$FaceText <- lapply(
         venn_gp$FaceText,
         function(x) {
-          x$cex <- as.numeric(input$venn_cex)
+          x$cex <- as.numeric(input$venn_cex / 2)
           return(x)
         }
       )
@@ -496,8 +610,18 @@ mod_tab_venn_upset_server <- function(id){
       }
     )
 
-    output$download_test_data_venn <- shiny::downloadHandler(
-      filename = "venn_example_data.xlsx",
+    output$download_test_data_venn_pd <- shiny::downloadHandler(
+      filename = "venn_pd_example_data.xlsx",
+      content = function(file) {
+        file.copy(
+          from = system.file("ext/hcp_example_data.xlsx", package = "yasa"),
+          to = file
+        )
+      }
+    )
+
+    output$download_test_data_venn_list <- shiny::downloadHandler(
+      filename = "venn_list_example_data.xlsx",
       content = function(file) {
         file.copy(
           from = system.file("ext/venn_example_data.xlsx", package = "yasa"),
@@ -539,4 +663,18 @@ update_venn_color <- function(venn_gp, ggsci_pal_name) {
   venn_gp$SetText$Set6$col <- colors[6]
 
   return(venn_gp)
+}
+
+recode_found_in_sample <- function(string, allow_peak_found = TRUE) {
+  if (allow_peak_found) {
+    string_out <-
+      string %>%
+      dplyr::na_if("Peak Found") %>%
+      dplyr::na_if("n/a")
+  } else {
+    string_out <-
+      string %>%
+      dplyr::na_if("n/a")
+  }
+  string_out
 }

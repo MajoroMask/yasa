@@ -16,9 +16,11 @@ mod_subtab_is_calibration_ui <- function(id){
 
     br(),
     br(),
-    # h2(i18n("IS Calibration")),
 
     shiny::fluidRow(
+
+      # upper left box ----
+
       shinydashboardPlus::box(
         title = i18n("Data upload & settings"),
         width = 4,
@@ -28,7 +30,8 @@ mod_subtab_is_calibration_ui <- function(id){
           height = "100%",
           width = "100%",
 
-          # upload tab
+          ## upload tab ----
+
           shiny::tabPanel(
             title = i18n("Upload data"),
             shiny::fileInput(
@@ -83,7 +86,8 @@ mod_subtab_is_calibration_ui <- function(id){
             ),
           ),
 
-          # setting tab
+          ## setting tab ----
+
           shiny::tabPanel(
             title = i18n("Settings"),
             shiny::selectInput(
@@ -103,6 +107,9 @@ mod_subtab_is_calibration_ui <- function(id){
           )
         )
       ),
+
+      # upper right box ----
+
       shinydashboardPlus::box(
         title = i18n("Output & Usage Instructions"),
         width = 8,
@@ -145,6 +152,8 @@ mod_subtab_is_calibration_server <- function(id) {
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
+    # data init ----
+
     rv_iscal <- rv(
       tb_pro = NULL,
       tb_pep = NULL,
@@ -186,7 +195,8 @@ mod_subtab_is_calibration_server <- function(id) {
         )
     })
 
-    # render output table
+    ## render output table ----
+
     output$iscal_output <- DT::renderDT(
       expr = {
         req(rv_iscal$tb_pro)
@@ -205,7 +215,7 @@ mod_subtab_is_calibration_server <- function(id) {
       options = list(scrollX = TRUE)
     )
 
-    # download output
+    ## download output ----
 
     output$download_iscal_output <- shiny::downloadHandler(
       filename = "iscal_result.xlsx",
@@ -219,7 +229,7 @@ mod_subtab_is_calibration_server <- function(id) {
       }
     )
 
-    # download example data
+    ## download example data ----
 
     output$download_test_data_iscal_prot <- shiny::downloadHandler(
       filename = "iscal_proteins.xlsx",

@@ -7,7 +7,8 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-#' @importFrom shinydashboardPlus dashboardPage dashboardHeader dashboardSidebar box
+#' @importFrom shinydashboardPlus dashboardPage dashboardHeader dashboardSidebar
+#'   box
 #' @importFrom shinydashboard dashboardBody
 
 mod_my_esquisse_ui <- function(id) {
