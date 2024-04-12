@@ -196,19 +196,23 @@ mod_tab_venn_upset_ui <- function(id){
                 )
               )
             ),
-            shiny::numericInput(
+            shiny::sliderInput(
               ns("venn_labelsize"),
-              label = "Label font size",
+              label = i18n("Label font size"),
               value = 15,
               min = 1,
-              max = 50
+              max = 50,
+              ticks = TRUE,
+              step = 1
             ),
-            shiny::numericInput(
+            shiny::sliderInput(
               ns("venn_cex"),
-              label = "Number font size",
-              value = 1.5,
-              min = 0.5,
-              max = 20
+              label = i18n("Number font size"),
+              value = 3,
+              min = 0,
+              max = 10,
+              ticks = TRUE,
+              step = 0.1
             )
           )
         )
@@ -357,7 +361,7 @@ mod_tab_venn_upset_server <- function(id){
       venn_gp$FaceText <- lapply(
         venn_gp$FaceText,
         function(x) {
-          x$cex <- as.numeric(input$venn_cex)
+          x$cex <- as.numeric(input$venn_cex / 2)
           return(x)
         }
       )
