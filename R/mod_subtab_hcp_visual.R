@@ -44,17 +44,17 @@ mod_subtab_hcp_visual_ui <- function(id){
             title = i18n("Upload data"),
             shinyWidgets::actionBttn(
               inputId = ns("launch_import_modal"),
-              label = i18n("Click to import data"),
+              label = i18n("Click to upload data"),
               style = "bordered",
+              block = TRUE,
               color = "success",
               icon = icon("sliders")
             ),
+            shiny::uiOutput(ns("ui_column_selection")),
             shiny::downloadLink(
               ns("download_test_data_hcp"),
               label = i18n("Download example data"),
-            ),
-            br(),
-            shiny::uiOutput(ns("ui_column_selection"))
+            )
           ),
 
           ### setting tab ----

@@ -5,8 +5,15 @@ Venn diagrams,文氏图
 Data upload & settings,数据和参数设置
 Upload data,上传数据
 Upload file,上传文件
+Click to upload data,点击上传数据
+Download example PD data,下载示例PD文件
+Download example venn list,下载示例文氏图列表
+Input type,输入文件类型
+Upload PD file or venn list,上传PD文件或文氏图列表
 Header line in data,数据中包含标题行
 Settings,参数设置
+Select sets data,选择组别数据
+`Peak found` as positive,`Peak found`记为阳性
 Select sets,选择组别
 Classical venn,经典文氏图
 Chow-Ruskey venn,Chow-Ruskey文氏图
