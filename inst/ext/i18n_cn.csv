@@ -68,6 +68,7 @@ Molecular weight transformation,分子量变换
 MW transformation,分子量变换
 Abundance transformation,信号强度变换
 High-risk protein warning,高风险蛋白提示
+One accession per line,输入蛋白ID，每行一个
 Filter data,数据过滤
 Download output,结果下载
 Download bubble plot,下载气泡图
