@@ -68,6 +68,7 @@ Molecular weight transformation,分子量变换
 MW transformation,分子量变换
 Abundance transformation,信号强度变换
 High-risk protein warning,高风险蛋白提示
+One accession per line,输入蛋白ID，每行一个
 Filter data,数据过滤
 Download output,结果下载
 Download bubble plot,下载气泡图
@@ -82,6 +83,8 @@ Select case/control ratio,选择实验/对照信号强度比
 Select protein accession,选择蛋白ID
 Select molecular weight (MW),选择蛋白分子量
 Select isoelectric point (pI),选择蛋白等电点
+Filter protein by accession,根据蛋白ID过滤
+Select by accession,根据ID选择
 Bubble plot & Usage Instructions,气泡图 & 使用说明
 Bubble plot,气泡图
 Top differential HCPs,排名靠前的HCP

@@ -133,9 +133,7 @@ mod_subtab_is_calibration_ui <- function(id){
           ),
           shiny::tabPanel(
             title = i18n("Usage Instructions"),
-            h4("Instructions for IS calibration"),
-            p("Some instruction."),
-            p("And some other instruction.")
+            render_yasa_markdown_docs("docs_iscal.md")
           )
         )
       )

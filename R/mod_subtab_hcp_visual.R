@@ -51,6 +51,7 @@ mod_subtab_hcp_visual_ui <- function(id){
               icon = icon("sliders")
             ),
             shiny::uiOutput(ns("ui_column_selection")),
+            shiny::uiOutput(ns("ui_acc_filter")),
             shiny::downloadLink(
               ns("download_test_data_hcp"),
               label = i18n("Download example data"),
@@ -90,6 +91,15 @@ mod_subtab_hcp_visual_ui <- function(id){
               ),
               selected = "none"
             ),
+            # shiny::textAreaInput(
+            #   ns("high_risk_warning"),
+            #   label = i18n("High-risk protein warning"),
+            #   value = "",
+            #   width = "100%",
+            #   rows = 6L,
+            #   placeholder = i18n("One accession per line"),
+            #   resize = "vertical"
+            # ),
             colourpicker::colourInput(
               ns("case_color"),
               label = i18n("Case color"),
@@ -172,6 +182,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           width = "100%",
 
           ## bubble plot tab ----
+
           shiny::tabPanel(
             title = i18n("Bubble plot"),
             plotly::plotlyOutput(
@@ -182,6 +193,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ## venn tab ----
+
           shiny::tabPanel(
             title = i18n("Venn diagram"),
             plotOutput(
@@ -192,11 +204,10 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ## docs tab ----
+
           shiny::tabPanel(
             title = i18n("Usage Instructions"),
-            h4("Instructions for HCP visualization"),
-            p("Some instruction."),
-            p("And some other instruction.")
+            render_yasa_markdown_docs("docs_hcp.md")
           )
         )
       )
@@ -216,6 +227,23 @@ mod_subtab_hcp_visual_ui <- function(id){
         )
       )
     )
+
+    # 3rd row ----
+
+    # shiny::fluidRow(
+    #   shinydashboardPlus::box(
+    #     title = i18n("Playground"),
+    #     width = 6,
+    #     status = "danger",
+    #     shiny::verbatimTextOutput(ns("test01"))
+    #   ),
+    #   shinydashboardPlus::box(
+    #     title = i18n("Another playground"),
+    #     width = 6,
+    #     status = "danger",
+    #     shiny::verbatimTextOutput(ns("test02"))
+    #   ),
+    # )
   )
 }
 
@@ -242,6 +270,7 @@ mod_subtab_hcp_visual_server <- function(id) {
       tb_to_filter = NULL,  # tb sent to datamods::filter_data module
       origin_colnames = NULL,  # selected colnames
       selected_colnames = NULL,
+      high_risk_list = NULL,  # char var of high risk protein acc
       tb_plot = NULL,
       p_bubble = NULL,  # bubble plot from plotly
       tb_plotly_selecting = NULL, # selecting data from plotly
@@ -281,6 +310,21 @@ mod_subtab_hcp_visual_server <- function(id) {
       req(rv_hcp$tb_input())
       origin_colnames <- colnames(rv_hcp$tb_input())
       origin_colnames
+    })
+
+    rv_hcp$high_risk_list <- reactive({
+      req(input$high_risk_warning)
+
+      if (input$high_risk_warning == "none") {
+        v_out <- character(0L)
+      }
+      if (input$high_risk_warning == "cho") {
+        v_out <-
+          system.file("ext/high_risk_cho.txt", package = "yasa") %>%
+          readLines()
+      }
+
+      v_out
     })
 
     ## column selection UI ----
@@ -408,6 +452,32 @@ mod_subtab_hcp_visual_server <- function(id) {
       ui_out
     })
 
+    ## acc filter ui ----
+
+    output$ui_acc_filter <- renderUI({
+      req(rv_hcp$tb_input())
+      req(input$col_acc)
+
+      tbi <- rv_hcp$tb_input()
+
+      ui_out <-
+        shinyWidgets::pickerInput(
+          ns("acc_filter"),
+          label = i18n("Filter protein by accession"),
+          choices = tbi %>% pull(input$col_acc),
+          selected = tbi %>% pull(input$col_acc),
+          multiple = TRUE,
+          options = list(
+            title = i18n("Select by accession"),
+            `live-search` = TRUE,
+            `actions-box` = TRUE,
+            `selected-text-format` = "count > 5",
+            size = 8
+          )
+        )
+      ui_out
+    })
+
     # select data ----
 
     rv_hcp$selected_colnames <- reactive({
@@ -435,6 +505,7 @@ mod_subtab_hcp_visual_server <- function(id) {
       req(rv_hcp$selected_colnames())
       req(input$mw_trans)
       req(input$abun_trans)
+      req(input$acc_filter)
 
       tb <- rv_hcp$tb_input()
       selected_colnames <- rv_hcp$selected_colnames()
@@ -444,6 +515,7 @@ mod_subtab_hcp_visual_server <- function(id) {
       tb_to_filter <-
         tb %>%
         dplyr::select(.idx, dplyr::all_of(selected_colnames)) %>%
+        filter(acc %in% input$acc_filter) %>%
         ratio_and_intensity(mw_trans, abun_trans)
       tb_to_filter
     })
@@ -491,6 +563,17 @@ mod_subtab_hcp_visual_server <- function(id) {
       tb_plot <-
         filter_result$filtered() %>%
         left_join(tb_label, by = ".idx")
+
+      if (isTruthy(rv_hcp$high_risk_list())) {
+        tb_plot <-
+          tb_plot %>%
+          mutate(high_light = acc %in% rv_hcp$high_risk_list())
+      } else {
+        tb_plot <-
+          tb_plot %>%
+          mutate(high_light = FALSE)
+      }
+
       tb_plot
     })
 
@@ -543,9 +626,33 @@ mod_subtab_hcp_visual_server <- function(id) {
             '<br>ratio:', label_ratio
           ),
           textposition = "top",
-
           customdata = tb_p$.idx
-        ) %>%
+        )
+
+      if (any(rv_hcp$tb_plot()$high_light)) {
+        tb_highlight <-
+          rv_hcp$tb_plot() %>%
+          filter(high_light)
+
+        p_bubble <-
+          p_bubble %>%
+          plotly::add_annotations(
+            x = tb_highlight$pi,
+            y = tb_highlight$mw,
+            text = tb_highlight$acc,
+            xref = "x",
+            yref = "y",
+            showarrow = TRUE,
+            arrowhead = 4,
+            arrowsize = .5,
+            ax = 20,
+            ay = -40,
+            bgcolor = "rgba(255, 255, 255, 50)"
+          )
+      }
+
+      p_bubble <-
+        p_bubble %>%
         plotly::layout(
           dragmode = "select",
           xaxis = list(
@@ -571,6 +678,13 @@ mod_subtab_hcp_visual_server <- function(id) {
           aes(pi, mw, fill = sample, size = abun_filled),
           shape = 21, alpha = I(input$bubble_alpha),
           stroke = input$bubble_border, color = "#000000"
+        ) +
+        ggrepel::geom_label_repel(
+          data = rv_hcp$tb_plot() %>% filter(high_light),
+          mapping = aes(pi, mw, label = acc),
+          hjust = 0, nudge_x = 0.1,
+          vjust = 0, nudge_y = 0.1,
+          label.size = 0, fill = "#ffffff", alpha = I(0.6)
         ) +
         scale_fill_manual(
           values = c(case = input$case_color, control = input$control_color),
@@ -681,12 +795,26 @@ mod_subtab_hcp_visual_server <- function(id) {
             dplyr::pull(.idx)
         }
 
-        tb_display <-
+        if (isTruthy(rv_hcp$high_risk_list())) {
+          highlight_idx <-
+            rv_hcp$tb_plot() %>%
+            filter(acc %in% rv_hcp$high_risk_list()) %>%
+            pull(.idx)
+        } else {
+          highlight_idx <- integer(0L)
+        }
+
+        tb_tmp <-
           rv_hcp$tb_input() %>%
           filter(.idx %in% selecting_idx) %>%
           select(
             all_of(unname(rv_hcp$selected_colnames())),
             everything()
+          )
+        tb_display <-
+          dplyr::bind_rows(
+            tb_tmp %>% filter(.idx %in% highlight_idx),
+            tb_tmp %>% filter(!.idx %in% highlight_idx)
           ) %>%
           select(-.idx)
 
@@ -755,16 +883,6 @@ mod_subtab_hcp_visual_server <- function(id) {
         )
       }
     )
-
-    # pg ----
-
-    # output$test01 <- renderPrint({
-    #   rv_hcp$tb_to_filter()
-    # })
-    #
-    # output$test02 <- renderPrint({
-    #   rv_hcp$tb_plot()
-    # })
   })
 }
 

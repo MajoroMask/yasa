@@ -79,6 +79,7 @@ golem::add_module(name = "subtab_hcp_visual", with_test = TRUE)
 # golem::add_fct("helpers", with_test = TRUE)
 golem::add_fct("read_input_tb", with_test = TRUE)
 golem::add_fct("is_calibrate", with_test = TRUE)
+golem::add_fct("render_markdown_docs", with_test = FALSE)
 # golem::add_utils("helpers", with_test = TRUE)
 
 ## External resources

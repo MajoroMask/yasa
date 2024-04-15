@@ -38,15 +38,6 @@ mod_tab_venn_upset_ui <- function(id){
 
           shiny::tabPanel(
             title = i18n("Upload data"),
-            shinyWidgets::actionBttn(
-              inputId = ns("launch_import_modal"),
-              label = i18n("Click to upload data"),
-              style = "bordered",
-              block = TRUE,
-              color = "success",
-              icon = icon("sliders")
-            ),
-            br(),
             shinyWidgets::switchInput(
               inputId = ns("venn_input_type"),
               label = i18n("Input type"),
@@ -57,6 +48,15 @@ mod_tab_venn_upset_ui <- function(id){
               onStatus = "primary",
               offStatus = "success"
             ),
+            shinyWidgets::actionBttn(
+              inputId = ns("launch_import_modal"),
+              label = i18n("Click to upload data"),
+              style = "bordered",
+              block = TRUE,
+              color = "success",
+              icon = icon("sliders")
+            ),
+            br(),
             shiny::uiOutput(ns("ui_column_selection")),
             br(),
             shiny::downloadLink(
@@ -75,6 +75,14 @@ mod_tab_venn_upset_ui <- function(id){
           shiny::tabPanel(
             title = i18n("Settings"),
             shiny::uiOutput(ns("venn_data_sets")),
+            # shiny::selectInput(
+            #   ns("venn_sets_selected"),
+            #   label = i18n("Select sets"),
+            #   choices = list(),
+            #   multiple = TRUE,
+            #   selectize = TRUE,
+            #   selected = NULL
+            # ),
             shiny::selectInput(
               ns("venn_type"),
               label = i18n("Venn diagram type"),
@@ -266,17 +274,7 @@ mod_tab_venn_upset_ui <- function(id){
 
           shiny::tabPanel(
             title = i18n("Usage Instructions"),
-            h4("Instructions for Venn diagram module"),
-            p(
-              paste0(
-                "To use this venn module, ",
-                "you can upload a correctly formatted csv/text file, ",
-                "with lists of names. ",
-                "Each column represents a set, and each row represents ",
-                "an element (names/gene/SNPs)."
-              )
-            ),
-            p("Header names (first row) will be used as set names.")
+            render_yasa_markdown_docs("docs_venn.md")
           )
         )
       )
@@ -369,6 +367,7 @@ mod_tab_venn_upset_server <- function(id){
           purrr::map(.f = ~ .x[!is.na(.x)])
       } else if (rv_input_type() == "pd") {
         req(input$cols_sets)
+        req(all(input$cols_sets %in% colnames(rv_imported_data$data())))
 
         l_out <-
           rv_imported_data$data() %>%
@@ -377,11 +376,15 @@ mod_tab_venn_upset_server <- function(id){
           mutate(.idx = as.character(.idx)) %>%
           rename_with(
             .cols = -.idx,
-            .fn = ~ stringr::str_replace(
-              .x,
-              stringr::regex("found in sample\\:?", ignore_case = TRUE),
-              ""
-            )
+            .fn = ~
+              stringr::str_replace(
+                .x,
+                pattern = stringr::regex(
+                  "found in sample\\:?(.*)(\\: sample)$", ignore_case = TRUE
+                ),
+                replacement = "\\1"
+              ) %>%
+              stringr::str_trim()
           ) %>%
           mutate(
             across(
@@ -422,6 +425,17 @@ mod_tab_venn_upset_server <- function(id){
       )
       ui_out
     })
+    # ob_update_sets_selected <- observe({
+    #   set_names <- names(venn_data())
+    #
+    #   shiny::updateSelectInput(
+    #     session,
+    #     inputId = "venn_sets_selected",
+    #     label = i18n("Select sets"),
+    #     choices = as.character(set_names),
+    #     selected = as.character(set_names[1:5])
+    #   )
+    # })
 
     venn_selected_names <- reactive({
       venn_selected_names <- as.character(c(input$venn_sets_selected))
@@ -528,6 +542,7 @@ mod_tab_venn_upset_server <- function(id){
 
     output$venn_plot <- renderPlot(
       expr = {
+        req(Vennerable:::NumberOfSets(venn_combinations()) >= 2)
 
         venn_plot <- Vennerable::compute.Venn(
           venn_combinations(),
