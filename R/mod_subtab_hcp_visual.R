@@ -51,6 +51,7 @@ mod_subtab_hcp_visual_ui <- function(id){
               icon = icon("sliders")
             ),
             shiny::uiOutput(ns("ui_column_selection")),
+            shiny::uiOutput(ns("ui_acc_filter")),
             shiny::downloadLink(
               ns("download_test_data_hcp"),
               label = i18n("Download example data"),
@@ -451,6 +452,32 @@ mod_subtab_hcp_visual_server <- function(id) {
       ui_out
     })
 
+    ## acc filter ui ----
+
+    output$ui_acc_filter <- renderUI({
+      req(rv_hcp$tb_input())
+      req(input$col_acc)
+
+      tbi <- rv_hcp$tb_input()
+
+      ui_out <-
+        shinyWidgets::pickerInput(
+          ns("acc_filter"),
+          label = i18n("Filter protein by accession"),
+          choices = tbi %>% pull(input$col_acc),
+          selected = tbi %>% pull(input$col_acc),
+          multiple = TRUE,
+          options = list(
+            title = i18n("Select by accession"),
+            `live-search` = TRUE,
+            `actions-box` = TRUE,
+            `selected-text-format` = "count > 5",
+            size = 8
+          )
+        )
+      ui_out
+    })
+
     # select data ----
 
     rv_hcp$selected_colnames <- reactive({
@@ -478,6 +505,7 @@ mod_subtab_hcp_visual_server <- function(id) {
       req(rv_hcp$selected_colnames())
       req(input$mw_trans)
       req(input$abun_trans)
+      req(input$acc_filter)
 
       tb <- rv_hcp$tb_input()
       selected_colnames <- rv_hcp$selected_colnames()
@@ -487,6 +515,7 @@ mod_subtab_hcp_visual_server <- function(id) {
       tb_to_filter <-
         tb %>%
         dplyr::select(.idx, dplyr::all_of(selected_colnames)) %>%
+        filter(acc %in% input$acc_filter) %>%
         ratio_and_intensity(mw_trans, abun_trans)
       tb_to_filter
     })

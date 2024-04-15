@@ -83,6 +83,8 @@ Select case/control ratio,选择实验/对照信号强度比
 Select protein accession,选择蛋白ID
 Select molecular weight (MW),选择蛋白分子量
 Select isoelectric point (pI),选择蛋白等电点
+Filter protein by accession,根据蛋白ID过滤
+Select by accession,根据ID选择
 Bubble plot & Usage Instructions,气泡图 & 使用说明
 Bubble plot,气泡图
 Top differential HCPs,排名靠前的HCP
