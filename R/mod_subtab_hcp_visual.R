@@ -172,6 +172,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           width = "100%",
 
           ## bubble plot tab ----
+
           shiny::tabPanel(
             title = i18n("Bubble plot"),
             plotly::plotlyOutput(
@@ -182,6 +183,7 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ## venn tab ----
+
           shiny::tabPanel(
             title = i18n("Venn diagram"),
             plotOutput(
@@ -192,11 +194,10 @@ mod_subtab_hcp_visual_ui <- function(id){
           ),
 
           ## docs tab ----
+
           shiny::tabPanel(
             title = i18n("Usage Instructions"),
-            h4("Instructions for HCP visualization"),
-            p("Some instruction."),
-            p("And some other instruction.")
+            render_yasa_markdown_docs("docs_hcp.md")
           )
         )
       )
