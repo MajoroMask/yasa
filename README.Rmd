@@ -53,6 +53,7 @@ docker run --rm \
 
 ``` r
 library(yasa)
+options(shiny.port = 3838, shiny.host = "0.0.0.0")
 
 set_i18n('cn')
 set_i18n(system.file('ext/i18n_cn.csv', package = 'yasa')
